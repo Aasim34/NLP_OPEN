@@ -55,9 +55,18 @@ Built with FastAPI backend and React frontend, this application runs **completel
 This script will:
 - ✅ Check prerequisites
 - ✅ Install dependencies (if needed)
-- ✅ Start backend server at `http://127.0.0.1:8000`
-- ✅ Start frontend server at `http://localhost:5173`
+- ✅ Start backend server at `http://127.0.0.1:8000` in a new window
+- ✅ Start frontend server at `http://localhost:5173` in a new window
 - ✅ Open the application in your browser
+
+**Alternative**: Start servers individually:
+```powershell
+# Start only backend
+.\start_backend.ps1
+
+# Start only frontend  
+.\start_frontend.ps1
+```
 
 ### Manual Setup
 
