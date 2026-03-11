@@ -32,20 +32,38 @@ $FrontendPath = Join-Path $ProjectRoot "Frontend"
 Write-Host "[1/5] Checking prerequisites..." -ForegroundColor Yellow
 
 # Check if Python is installed
+$pythonInstalled = $false
 try {
     $pythonVersion = python --version 2>&1
-    Write-Host "  ✓ Python found: $pythonVersion" -ForegroundColor Green
-} catch {
+    if ($LASTEXITCODE -eq 0) {
+        $pythonInstalled = $true
+        Write-Host "  ✓ Python found: $pythonVersion" -ForegroundColor Green
+    }
+}
+catch {
+    $pythonInstalled = $false
+}
+
+if (-not $pythonInstalled) {
     Write-Host "  ✗ Python not found. Please install Python 3.11+" -ForegroundColor Red
     Write-Host "    Download: https://www.python.org/downloads/" -ForegroundColor Red
     exit 1
 }
 
 # Check if Node.js is installed
+$nodeInstalled = $false
 try {
     $nodeVersion = node --version 2>&1
-    Write-Host "  ✓ Node.js found: $nodeVersion" -ForegroundColor Green
-} catch {
+    if ($LASTEXITCODE -eq 0) {
+        $nodeInstalled = $true
+        Write-Host "  ✓ Node.js found: $nodeVersion" -ForegroundColor Green
+    }
+}
+catch {
+    $nodeInstalled = $false
+}
+
+if (-not $nodeInstalled) {
     Write-Host "  ✗ Node.js not found. Please install Node.js 18+" -ForegroundColor Red
     Write-Host "    Download: https://nodejs.org/" -ForegroundColor Red
     exit 1
@@ -64,10 +82,21 @@ if (-not (Test-Path $BackendPath)) {
 }
 
 # Check if uvicorn is installed
+$uvicornInstalled = $false
 try {
     python -c "import uvicorn" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        $uvicornInstalled = $true
+    }
+}
+catch {
+    $uvicornInstalled = $false
+}
+
+if ($uvicornInstalled) {
     Write-Host "  ✓ Backend dependencies installed" -ForegroundColor Green
-} catch {
+}
+else {
     Write-Host "  ✗ Backend dependencies missing" -ForegroundColor Red
     Write-Host "    Installing dependencies..." -ForegroundColor Yellow
     
