@@ -21,6 +21,59 @@ for _roman, _devanagari in _PHONETIC_FIXES.items():
     _DEVANAGARI_TO_ROMAN.setdefault(_devanagari, _roman)
 
 
+# ---------------------------------------------------------------------------
+# Smart Finglish cleanup patterns
+# Fixes unnatural ITRANS romanizations to produce natural Hinglish output
+# ---------------------------------------------------------------------------
+_FINGLISH_CLEANUP_PATTERNS = [
+    # ITRANS uses capital letters for special sounds - lowercase them
+    (r'A', 'a'),        # आ → a (not A)
+    (r'I', 'i'),        # ई → i (not I)
+    (r'U', 'u'),        # ऊ → u (not U)
+    (r'e', 'e'),        # ए → e
+    (r'ai', 'ai'),      # ऐ → ai
+    (r'o', 'o'),        # ओ → o
+    (r'au', 'au'),      # औ → au
+    
+    # Common cleanup patterns
+    ("egzAm", "exam"),
+    ("egzAma", "exam"),
+    ("kAra", "kar"),
+    ("lenA", "lena"),
+    ("denA", "dena"),
+    ("AyA", "aaya"),
+    ("gayA", "gaya"),
+    ("ThA", "tha"),
+    ("ThI", "thi"),
+]
+
+
+def _cleanup_finglish(text: str) -> str:
+    """
+    Smart cleanup of Finglish output to make it more natural.
+    Removes awkward ITRANS patterns and capitalizations.
+    
+    Example:
+        egzAma → exam
+        kAra → kar
+        lenA → lena
+    
+    Args:
+        text: Finglish text that may contain unnatural patterns
+    
+    Returns:
+        Cleaned Finglish text
+    """
+    result = text
+    
+    # Apply word-level replacements
+    for pattern, replacement in _FINGLISH_CLEANUP_PATTERNS:
+        if pattern in result:
+            result = result.replace(pattern, replacement)
+    
+    return result
+
+
 def convert(hindi_text: str) -> str:
     """
     Convert a Devanagari Hindi sentence into Finglish
@@ -54,6 +107,9 @@ def convert(hindi_text: str) -> str:
             finglish_words.append(roman.lower())
 
     result = " ".join(finglish_words)
+
+    # --- Post-processing: Smart cleanup of unnatural ITRANS patterns ---
+    result = _cleanup_finglish(result)
 
     # Capitalize only the first letter
     if result:

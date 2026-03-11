@@ -223,6 +223,7 @@ _PHONETIC_FIXES: dict[str, str] = {
     "sau": "सौ", "hazaar": "हज़ार", "hazar": "हज़ार", "lakh": "लाख",
 
     # --- English loanwords (phonetic Devanagari, not translation) ---
+    "rest": "रेस्ट", "break": "ब्रेक",
     "meeting": "मीटिंग", "office": "ऑफिस",
     "school": "स्कूल", "college": "कॉलेज",
     "phone": "फ़ोन", "mobile": "मोबाइल",
@@ -238,6 +239,13 @@ _PHONETIC_FIXES: dict[str, str] = {
     "report": "रिपोर्ट", "project": "प्रोजेक्ट",
     "company": "कंपनी", "team": "टीम",
     "class": "क्लास", "exam": "एग्ज़ाम", "exams": "एग्ज़ाम्स", "test": "टेस्ट",
+    "student": "स्टूडेंट", "teacher": "टीचर",
+    "problem": "प्रॉब्लम", "issue": "इश्यू", "solution": "सल्यूशन",
+    "idea": "आइडिया", "plan": "प्लान", "target": "टार्गेट",
+    "result": "रिजल्ट", "marks": "मार्क्स", "score": "स्कोर",
+    "form": "फ़ार्म", "application": "एप्लिकेशन",
+    "training": "ट्रेनिंग", "manager": "मैनेजर", "customer": "कस्टमर",
+    "service": "सर्विस", "patient": "पेशेंट", "medicine": "मेडिसिन",
     "tayari": "तैयारी", "tayyari": "तैयारी", "tyaari": "तैयारी",
     "tayyar": "तैयार", "tayaar": "तैयार",
     "zaroori": "ज़रूरी", "jaroori": "ज़रूरी",
@@ -283,7 +291,114 @@ _PHONETIC_FIXES: dict[str, str] = {
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Natural Hindi word replacement map
+# Replaces transliterated English loanwords with natural Hindi equivalents
+# This is applied AFTER transliteration to produce more natural Hindi output
+# ---------------------------------------------------------------------------
+_ENGLISH_TO_HINDI_NATURAL: dict[str, str] = {
+    # Common English words → Natural Hindi equivalents
+    "रेस्ट": "आराम",
+    "ब्रेक": "विराम",
+    "मीटिंग": "बैठक",
+    "एग्ज़ाम": "परीक्षा",
+    "एग्ज़ाम्स": "परीक्षाएं",
+    "टेस्ट": "परीक्षण",
+    "ऑफिस": "कार्यालय",
+    "प्रोजेक्ट": "परियोजना",
+    "रिपोर्ट": "प्रतिवेदन",
+    "क्लास": "कक्षा",
+    "टीचर": "अध्यापक",
+    "स्टूडेंट": "छात्र",
+    "स्कूल": "विद्यालय",
+    "कॉलेज": "महाविद्यालय",
+    "हॉस्पिटल": "अस्पताल",
+    "डॉक्टर": "चिकित्सक",
+    "पेशेंट": "रोगी",
+    "मेडिसिन": "दवा",
+    "ट्रेनिंग": "प्रशिक्षण",
+    "टीम": "दल",
+    "मैनेजर": "प्रबंधक",
+    "कस्टमर": "ग्राहक",
+    "सर्विस": "सेवा",
+    "प्रॉब्लम": "समस्या",
+    "इश्यू": "मुद्दा",
+    "सल्यूशन": "समाधान",
+    "आइडिया": "विचार",
+    "प्लान": "योजना",
+    "टार्गेट": "लक्ष्य",
+    "गोल": "लक्ष्य",
+    "रिजल्ट": "परिणाम",
+    "मार्क्स": "अंक",
+    "स्कोर": "अंक",
+    "रैंक": "श्रेणी",
+    "फ़ार्म": "प्रपत्र",
+    "एप्लिकेशन": "आवेदन",
+    "पेपर": "प्रश्नपत्र",
+    "रूल्स": "नियम",
+    "रेगुलेशन": "विनियम",
+}
+
+# Phrase-level replacements for contextual natural Hindi
+# Format: "word1 word2" → "replacement1 replacement2"
+_PHRASE_REPLACEMENTS: dict[str, str] = {
+    "रेस्ट लेना": "आराम करना",
+    "रेस्ट लेनी": "आराम करनी",
+    "रेस्ट लेनी": "आराम करनी",
+    "रेस्ट ले": "आराम कर",
+    "रेस्ट लो": "आराम करो",
+    "ब्रेक लेना": "विराम लेना",
+    "मीटिंग करना": "बैठक करना",
+}
+
+
+# ---------------------------------------------------------------------------
+# Post-processing: Replace English loanwords with natural Hindi
+# ---------------------------------------------------------------------------
+
+def _replace_with_natural_hindi(text: str) -> str:
+    """
+    Post-processing step that replaces transliterated English loanwords
+    with natural Hindi equivalents for more authentic Hindi output.
+    
+    Handles both phrase-level and word-level replacements.
+    
+    Example:
+        तुम्हें थोड़ा रेस्ट लेना चाहिए → तुम्हें थोड़ा आराम करना चाहिए
+        कल मीटिंग है ऑफिस में → कल बैठक है कार्यालय में
+    
+    Args:
+        text: Hindi sentence with potentially transliterated English words
+    
+    Returns:
+        Hindi sentence with natural Hindi replacements
+    """
+    result = text
+    
+    # First: Apply phrase-level replacements
+    for phrase, replacement in _PHRASE_REPLACEMENTS.items():
+        if phrase in result:
+            result = result.replace(phrase, replacement)
+    
+    # Second: Apply word-level replacements
+    words = result.split()
+    natural_words = []
+    
+    for word in words:
+        # Strip punctuation for matching
+        word_clean = word.rstrip(",।.!?")
+        punct = word[len(word_clean):] if len(word) > len(word_clean) else ""
+        
+        # Check if this word has a natural Hindi equivalent
+        if word_clean in _ENGLISH_TO_HINDI_NATURAL:
+            natural_words.append(_ENGLISH_TO_HINDI_NATURAL[word_clean] + punct)
+        else:
+            natural_words.append(word)
+    
+    return " ".join(natural_words)
+
+
+# ---------------------------------------------------------------------------
+# Helper functions
 # ---------------------------------------------------------------------------
 
 def _is_devanagari(word: str) -> bool:
@@ -359,10 +474,15 @@ def convert(sentence: str) -> str:
 
     raw_hindi = " ".join(hindi_tokens)
 
-    # --- Post-step: add basic Hindi punctuation for better structure ---
-    result = _add_hindi_punctuation(raw_hindi)
+    # --- Post-step 1: add basic Hindi punctuation for better structure ---
+    punctuated = _add_hindi_punctuation(raw_hindi)
+    
+    # --- Post-step 2: replace English loanwords with natural Hindi equivalents ---
+    result = _replace_with_natural_hindi(punctuated)
 
-    print(f"  [hinglish_to_hindi] tokens={tokens} → hindi='{result}'")
+    print(f"  [hinglish_to_hindi] tokens={tokens} → raw_hindi='{raw_hindi}'")
+    print(f"  [hinglish_to_hindi] after_punctuation='{punctuated}'")
+    print(f"  [hinglish_to_hindi] final_natural_hindi='{result}'")
     return result
 
 
