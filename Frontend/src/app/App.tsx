@@ -31,8 +31,22 @@ export default function App() {
     setIsLoading(true);
     
     try {
+      // Determine the correct backend URL
+      const getBackendUrl = () => {
+        // Check if we're on a forwarded URL (like GitHub Codespaces or VS Code port forwarding)
+        const hostname = window.location.hostname;
+        if (hostname.includes('github') || hostname.includes('codespaces') || hostname.includes('app.github.dev')) {
+          // Use relative path for same-domain forwarding, or construct forwarded URL
+          return window.location.origin.replace('5173', '8000');
+        }
+        // Default to localhost for local development
+        return 'http://localhost:8000';
+      };
+
+      const backendUrl = getBackendUrl();
+      
       // Call the FastAPI backend
-      const response = await fetch('http://localhost:8000/convert', {
+      const response = await fetch(`${backendUrl}/convert`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

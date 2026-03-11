@@ -45,6 +45,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
     ],
+    allow_origin_regex=r"https://.*\.github\.dev|https://.*\.githubpreview\.dev|https://.*\.app\.github\.dev|https://.*\.codespaces\..*|https://.*\.ngrok\.io|https://.*\.ngrok-free\.app|https://.*\.loca\.lt",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
