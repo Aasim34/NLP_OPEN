@@ -1,0 +1,7 @@
+fastapi==0.115.6
+uvicorn==0.34.0
+indic-transliteration==2.3.64
+transformers==4.47.1
+torch==2.5.1
+nltk==3.9.1
+sentencepiece==0.2.0
