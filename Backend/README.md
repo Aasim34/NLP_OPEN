@@ -75,6 +75,20 @@ Convert Hinglish text to Hindi, Finglish, and English.
 }
 ```
 
+### Optional: External LLM (GROQ)
+
+The backend can optionally call an external LLM (GROQ) and return an
+additional `llm_output` field alongside the normal `hindi`, `finglish`, and
+`english` outputs. To enable this feature set the following environment
+variables before starting the server:
+
+- `GROQ_API_KEY` — your GROQ API key
+- `GROQ_MODEL` — model name (for example: `llama-3.3-70b-versatile`)
+
+If the variables are not set the endpoint will still work and return the
+local model outputs; the `llm_output` field will contain an explanatory
+message instead.
+
 ### GET `/`
 
 Health check endpoint - returns service status.

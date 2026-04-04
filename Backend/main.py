@@ -12,12 +12,18 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+import os
 
 # Ensure the project root is on sys.path so relative imports work
 # when running via `uvicorn main:app` from inside the project folder.
 _PROJECT_ROOT = str(Path(__file__).resolve().parent)
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
+
+# Load environment variables from Backend/.env if present so services can
+# read GROQ_API_KEY and GROQ_MODEL at import time.
+load_dotenv(str(Path(__file__).resolve().parent / ".env"))
 
 from routes.convert import router as convert_router  # noqa: E402
 

@@ -11,7 +11,7 @@ Write-Host ""
 
 # Get script directory
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$BackendPath = Join-Path $ScriptDir "language_converter_backend"
+$BackendPath = Join-Path $ScriptDir "Backend"
 
 # Change to backend directory and start server
 Set-Location $BackendPath

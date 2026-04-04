@@ -22,7 +22,7 @@ Write-Host ""
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # Define paths
-$BackendPath = Join-Path $ProjectRoot "language_converter_backend"
+$BackendPath = Join-Path $ProjectRoot "Backend"
 $FrontendPath = Join-Path $ProjectRoot "Frontend"
 
 # ==============================================================================

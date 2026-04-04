@@ -10,7 +10,8 @@ export default function App() {
   const [outputs, setOutputs] = useState({
     hindi: '',
     finglish: '',
-    english: ''
+    english: '',
+    llm_output: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +23,7 @@ export default function App() {
 
   const handleClear = () => {
     setInputText('');
-    setOutputs({ hindi: '', finglish: '', english: '' });
+    setOutputs({ hindi: '', finglish: '', english: '', llm_output: '' });
   };
 
   const handleConvert = async () => {
@@ -74,6 +75,7 @@ export default function App() {
         hindi: data.hindi,
         finglish: data.finglish,
         english: data.english,
+        llm_output: data.llm_output || ''
       });
     } catch (error) {
       console.error('Conversion error:', error);
@@ -179,8 +181,8 @@ export default function App() {
           </motion.div>
 
           {/* Output Cards */}
-          {(outputs.hindi || outputs.finglish || outputs.english) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+          {(outputs.hindi || outputs.finglish || outputs.english || outputs.llm_output) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
               <OutputCard
                 title="Hindi"
                 nativeTitle="हिंदी"
@@ -205,6 +207,14 @@ export default function App() {
                 gradient="bg-gradient-to-br from-green-50 to-white"
                 icon={<Globe className="w-6 h-6 text-green-600" />}
                 delay={0.3}
+              />
+              <OutputCard
+                title="Assistant"
+                nativeTitle="LLM Output"
+                content={outputs.llm_output}
+                gradient="bg-gradient-to-br from-purple-50 to-white"
+                icon={<Sparkles className="w-6 h-6 text-purple-600" />}
+                delay={0.4}
               />
             </div>
           )}
