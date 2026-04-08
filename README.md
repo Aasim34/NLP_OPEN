@@ -1,340 +1,211 @@
-# 🌐 Indian Code-Mixed Language Converter
+# Indian Code-Mixed Language Converter
 
-A full-stack web application that converts **Hinglish** (Hindi + English mixed) text into three formats:
-1. **Hindi** (Devanagari script)
-2. **Finglish** (Romanized Hindi)  
-3. **English** (Translation)
+A full-stack app for converting Hinglish text into three outputs:
 
-Built with FastAPI backend and React frontend, this application runs **completely offline** without requiring any external APIs.
+1. Hindi in Devanagari script
+2. Finglish, or Romanized Hindi
+3. English translation
 
-![Status](https://img.shields.io/badge/status-active-success.svg)
-![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
-![Node](https://img.shields.io/badge/node-18+-green.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+The local pipeline runs in the FastAPI backend. An optional GROQ-powered assistant output can be enabled through environment variables, but the core conversion flow does not require any external API.
 
----
+## Overview
 
-## ✨ Features
+- Backend: FastAPI service in [Backend/main.py](Backend/main.py)
+- Frontend: React + TypeScript app in [Frontend/src/app/App.tsx](Frontend/src/app/App.tsx)
+- PowerShell scripts: [backend.ps1](backend.ps1), [frontend.ps1](frontend.ps1), [run.ps1](run.ps1)
+- Test script: [test_optimizations.py](test_optimizations.py)
 
-### Backend
-- ✅ **Fully Offline** - No external API calls
-- ✅ **ML-Based Translation** - Uses Helsinki-NLP/opus-mt-hi-en transformer
-- ✅ **250+ Phonetic Map** - Accurate Hinglish to Hindi conversion
-- ✅ **Smart Punctuation** - Automatic comma and purna viram insertion
-- ✅ **Natural Finglish** - Reverse lookup for readable Roman Hindi
-- ✅ **FastAPI** - Modern, fast Python web framework
-- ✅ **CORS Enabled** - Ready for frontend integration
+## Features
 
-### Frontend
-- ✨ **Beautiful UI** - Gradient backgrounds & smooth animations
-- ✨ **Motion Animations** - Powered by Framer Motion
-- ✨ **Copy to Clipboard** - One-click copy for all outputs
-- ✨ **Type-Safe** - Full TypeScript support
-- ✨ **Fast Development** - Vite with instant HMR
-- ✨ **Responsive Design** - Works on mobile & desktop
+- Hinglish to Hindi transliteration with phonetic normalization
+- Hindi to Finglish reverse transliteration
+- Hindi to English translation using a local transformer model
+- Optional GROQ assistant output when `GROQ_API_KEY` and `GROQ_MODEL` are configured
+- CORS configured for local frontend development and common forwarded dev URLs
+- React UI with copy-to-clipboard output cards and animated sections
 
----
+## Repository Layout
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Python 3.11+** - [Download Python](https://www.python.org/downloads/)
-- **Node.js 18+** - [Download Node.js](https://nodejs.org/)
-
-### Installation
-
-1. **Clone or Download** this project
-
-2. **Run the launcher script** (Windows):
-
-```powershell
-.\run_servers.ps1
+```text
+NLP_OPEN1/
+├── Backend/
+│   ├── main.py
+│   ├── requirements.txt
+│   ├── .env.example
+│   ├── routes/
+│   ├── services/
+│   └── utils/
+├── Frontend/
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── src/
+├── backend.ps1
+├── frontend.ps1
+├── run.ps1
+├── test_optimizations.py
+└── README.md
 ```
 
-This script will:
-- ✅ Check prerequisites
-- ✅ Install dependencies (if needed)
-- ✅ Start backend server at `http://127.0.0.1:8000` in a new window
-- ✅ Start frontend server at `http://localhost:5173` in a new window
-- ✅ Open the application in your browser
+## Prerequisites
 
-**Alternative**: Start servers individually:
-```powershell
-# Start only backend
-.\start_backend.ps1
+- Python 3.11+
+- Node.js 18+
+- PowerShell on Windows
 
-# Start only frontend  
-.\start_frontend.ps1
+## Setup
+
+### 1. Clone and open the project
+
+Open the repository root in VS Code or PowerShell.
+
+### 2. Configure the backend environment
+
+Copy [Backend/.env.example](Backend/.env.example) to [Backend/.env](Backend/.env) and fill in real values if you want the optional GROQ output.
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
-### Manual Setup
+If those values are not set, the app still works and returns the local Hindi, Finglish, and English outputs.
 
-#### Backend Setup
+### 3. Install backend dependencies
 
 ```powershell
-cd language_converter_backend
+cd Backend
 pip install -r requirements.txt
-uvicorn main:app --reload
 ```
 
-#### Frontend Setup
+### 4. Install frontend dependencies
 
 ```powershell
 cd Frontend
 npm install
-npm run dev
 ```
 
----
+## Run
 
-## 📖 Usage
-
-1. **Open** the application at `http://localhost:5173`
-2. **Type** Hinglish text in the input box
-   - Example: `"hello bhai kaise ho"`
-3. **Click** the "Convert" button
-4. **View** three outputs:
-   - **Hindi**: हेलो भाई कैसे हो
-   - **Finglish**: Hello bhai kaise ho
-   - **English**: Hello, brother.
-5. **Copy** any output using the copy button
-
----
-
-## 📂 Project Structure
-
-```
-NLP_OPEN1/
-├── language_converter_backend/     # FastAPI backend
-│   ├── main.py                     # Entry point
-│   ├── routes/                     # API endpoints
-│   ├── services/                   # Conversion logic
-│   ├── utils/                      # Tokenizer utilities
-│   └── requirements.txt            # Python dependencies
-│
-├── Frontend/                       # React frontend
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── App.tsx            # Main component
-│   │   │   └── components/        # UI components
-│   │   └── main.tsx               # Entry point
-│   ├── vite.config.ts             # Vite configuration
-│   └── package.json               # Node dependencies
-│
-├── run_servers.ps1                # Launcher script
-├── test_translation.py            # Backend test script
-└── README.md                      # This file
-```
-
----
-
-## 🔧 API Reference
-
-### POST `/convert`
-
-Convert Hinglish text to all three formats.
-
-**Request:**
-```json
-{
-  "text": "mujhe new laptop kharidna hai"
-}
-```
-
-**Response:**
-```json
-{
-  "hindi": "मुझे न्यू लैपटॉप खरीदना है",
-  "finglish": "Mujhe new laptop kharidna hai",
-  "english": "I want to buy a new laptop."
-}
-```
-
-### GET `/`
-Health check endpoint
-
-### GET `/docs`
-Interactive API documentation (Swagger UI)
-
----
-
-## 📊 Example Outputs
-
-| Input | Hindi | Finglish | English |
-|-------|-------|----------|---------|
-| hello bhai kaise ho | हेलो भाई कैसे हो | Hello bhai kaise ho | Hello, brother. |
-| kal exam hai tayari kar lena | कल एग्ज़ाम है, तैयारी कर लेना | Kal exam hai tayari kar lena | Tomorrow, prepare. |
-| mujhe chai chahiye | मुझे चाय चाहिए | Mujhe chai chahiye | I need tea. |
-| office me meeting hai | ऑफिस में मीटिंग है | Office me meeting hai | There's a meeting in office. |
-
----
-
-## 🧠 How It Works
-
-### Pipeline Architecture
-
-```
-Input: "hello bhai kaise ho"
-         ↓
-[1] Normalization
-    (lowercase, strip whitespace)
-         ↓
-[2] Hinglish → Hindi
-    (Phonetic map + ITRANS transliteration)
-         ↓
-    "हेलो भाई कैसे हो"
-         ↓
-[3] Hindi → Finglish
-    (Reverse phonetic lookup + ITRANS)
-         ↓
-    "Hello bhai kaise ho"
-         ↓
-[4] Hindi → English
-    (MarianMT transformer with beam search)
-         ↓
-    "Hello, brother."
-```
-
-### Key Components
-
-1. **Spelling Normalization** - Corrects common misspellings
-2. **Phonetic Fixes Map** - 250+ entries for accurate conversion
-3. **Hindi Punctuation** - Adds commas at clause boundaries
-4. **Reverse Lookup** - Natural Finglish from phonetic map
-5. **MarianMT Model** - Helsinki-NLP/opus-mt-hi-en for translation
-
----
-
-## 🛠️ Tech Stack
-
-### Backend
-- **FastAPI** - Modern Python web framework
-- **HuggingFace Transformers** - ML models
-- **PyTorch** - Deep learning backend
-- **indic-transliteration** - ITRANS/IAST support
-- **NLTK** - Natural language toolkit
-
-### Frontend
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Motion (Framer Motion)** - Animations
-- **Tailwind CSS** - Styling
-- **Radix UI** - Accessible components
-- **Lucide React** - Icons
-
----
-
-## 📝 Testing
-
-### Backend Tests
+### Start backend only
 
 ```powershell
-python test_translation.py
+.\backend.ps1
 ```
 
-### API Test
+Backend URL: `http://127.0.0.1:8000`
+
+### Start frontend only
+
+```powershell
+.\frontend.ps1
+```
+
+Frontend URL: `http://localhost:5173`
+
+### Start both services
+
+Launch the backend and frontend scripts in separate PowerShell windows.
+
+## Usage
+
+1. Open the frontend at `http://localhost:5173`
+2. Enter Hinglish text such as `kal meeting hai office me`
+3. Click Convert
+4. Read the Hindi, Finglish, English, and optional assistant output cards
+5. Use the copy button on any result card to copy the text
+
+## API
+
+### `POST /convert`
+
+Request body:
+
+```json
+{
+     "text": "mujhe new laptop kharidna hai"
+}
+```
+
+Response body:
+
+```json
+{
+     "hindi": "मुझे न्यू लैपटॉप खरीदना है",
+     "finglish": "Mujhe new laptop kharidna hai",
+     "english": "I want to buy a new laptop.",
+     "llm_output": "I want to buy a new laptop."
+}
+```
+
+### `GET /`
+
+Health check that returns the service status.
+
+### `GET /docs`
+
+Swagger UI for interactive API exploration.
+
+## Conversion Flow
+
+The backend pipeline performs these steps:
+
+1. Normalize the input text
+2. Convert Hinglish to Hindi using phonetic mapping and transliteration helpers
+3. Convert Hindi to Finglish using reverse lookup rules
+4. Translate Hindi to English with a local Helsinki-NLP transformer model
+5. Optionally query GROQ for an additional assistant-style response
+
+## Testing
+
+Run the scripted backend checks from the repository root:
+
+```powershell
+python test_optimizations.py
+```
+
+You can also hit the API directly:
 
 ```powershell
 curl -X POST http://127.0.0.1:8000/convert `
-  -H "Content-Type: application/json" `
-  -d '{"text": "hello bhai"}'
+     -H "Content-Type: application/json" `
+     -d '{"text":"hello bhai kaise ho"}'
 ```
 
----
+## Troubleshooting
 
-## 🐛 Known Limitations
+- If port 8000 is busy, change the backend port in the `uvicorn` command inside [backend.ps1](backend.ps1).
+- If port 5173 is busy, change the Vite port in [frontend.ps1](frontend.ps1) or pass a different port to `npm run dev`.
+- If the first backend request is slow, the translation model is likely still loading.
+- If NLTK complains about missing data, download the required tokenizer package in the backend environment.
 
-1. **English Loanwords**: Technical terms transliterated to Devanagari may not translate perfectly (e.g., "laptop" → "flater")
-2. **Slang**: Very informal slang may need manual phonetic map entries
-3. **Code-switching**: Best results with Hindi-dominant sentences
-4. **Model Size**: First run downloads ~300 MB translation model
+## Tech Stack
 
----
+Backend:
 
-## 🔧 Troubleshooting
+- FastAPI
+- Uvicorn
+- Hugging Face Transformers
+- PyTorch
+- indic-transliteration
+- NLTK
+- Requests
+- python-dotenv
 
-### Backend Issues
+Frontend:
 
-**Port 8000 already in use:**
-```powershell
-uvicorn main:app --port 8001
-```
+- React 18
+- TypeScript
+- Vite
+- Motion
+- Tailwind CSS
+- Radix UI
+- Lucide React
 
-**Model download fails:**
-- Check internet connection (first run only)
-- Download manually from [HuggingFace](https://huggingface.co/Helsinki-NLP/opus-mt-hi-en)
+## Notes
 
-### Frontend Issues
+- The backend is designed to work without external services.
+- GROQ is optional and only used when the environment variables are configured.
+- The frontend talks to the backend on port 8000 by default.
 
-**Port 5173 already in use:**
-```powershell
-npm run dev -- --port 3000
-```
+## License
 
-**Dependencies not found:**
-```powershell
-rm -rf node_modules package-lock.json
-npm install
-```
-
----
-
-## 📄 Documentation
-
-- **Backend README**: [language_converter_backend/README.md](language_converter_backend/README.md)
-- **Frontend README**: [Frontend/README.md](Frontend/README.md)
-- **Translation Fix Summary**: [TRANSLATION_FIX_SUMMARY.md](TRANSLATION_FIX_SUMMARY.md)
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! To contribute:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License** - free for personal and commercial use.
-
----
-
-## 🙏 Credits
-
-- **Helsinki-NLP** - opus-mt-hi-en translation model
-- **HuggingFace** - Transformers library
-- **indic-transliteration** - ITRANS support
-- **Framer Motion** - Animation library
-- **Radix UI** - Accessible components
-
----
-
-## 📧 Support
-
-For issues, questions, or feature requests:
-- Create an issue on the project repository
-- Check existing documentation
-- Review troubleshooting section
-
----
-
-## 🎯 Roadmap
-
-- [ ] Support for more Indian languages (Marathi, Gujarati, Tamil)
-- [ ] Better model for English loanwords
-- [ ] Voice input support
-- [ ] Save/export conversion history
-- [ ] Dark mode support
-- [ ] Mobile app version
-
----
-
-**Made with ❤️ for Indian language processing**
+MIT License.

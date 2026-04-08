@@ -5,7 +5,7 @@
 # in separate terminal windows.
 #
 # Usage:
-#   .\run_servers.ps1
+#   .\run.ps1
 #
 # Requirements:
 #   - Python 3.11+ with backend dependencies installed
@@ -119,8 +119,13 @@ Write-Host ""
 Write-Host "[4/5] Starting backend server..." -ForegroundColor Yellow
 
 # Start backend script in new window
-$backendScript = Join-Path $ProjectRoot "start_backend.ps1"
-Start-Process powershell -ArgumentList "-NoExit","-ExecutionPolicy","Bypass","-File",$backendScript
+$backendScript = Join-Path $ProjectRoot "backend.ps1"
+if (-not (Test-Path $backendScript)) {
+    Write-Host "  X Backend launcher not found: $backendScript" -ForegroundColor Red
+    exit 1
+}
+
+Start-Process -FilePath powershell -ArgumentList @("-NoExit", "-ExecutionPolicy", "Bypass", "-File", $backendScript)
 
 Write-Host "  OK Backend server starting in new window..." -ForegroundColor Green
 Write-Host "     URL: http://127.0.0.1:8000" -ForegroundColor Cyan
@@ -137,8 +142,13 @@ Write-Host ""
 Write-Host "[5/5] Starting frontend server..." -ForegroundColor Yellow
 
 # Start frontend script in new window
-$frontendScript = Join-Path $ProjectRoot "start_frontend.ps1"
-Start-Process powershell -ArgumentList "-NoExit","-ExecutionPolicy","Bypass","-File",$frontendScript
+$frontendScript = Join-Path $ProjectRoot "frontend.ps1"
+if (-not (Test-Path $frontendScript)) {
+    Write-Host "  X Frontend launcher not found: $frontendScript" -ForegroundColor Red
+    exit 1
+}
+
+Start-Process -FilePath powershell -ArgumentList @("-NoExit", "-ExecutionPolicy", "Bypass", "-File", $frontendScript)
 
 Write-Host "  OK Frontend server starting in new window..." -ForegroundColor Green
 Write-Host "     URL: http://localhost:5173" -ForegroundColor Cyan
